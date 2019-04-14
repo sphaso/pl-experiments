@@ -1,2 +1,2 @@
-# pl-experiments
-Experiments in programming language
+# Programming Language Experiments
+Experiments from the book "Essentials of Programming Languages" by Friedman and Wand

@@ -20,8 +20,10 @@ extra-source-files:  CHANGELOG.md, README.md
 library plex
   exposed-modules:
     Let.Parser
-    Interpreter
-    Types
+    Let.Interpreter
+    Let.Types
+    Proc.Interpreter
+    Proc.Types
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13

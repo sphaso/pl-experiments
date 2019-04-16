@@ -1,4 +1,4 @@
-module Types where
+module Let.Types where
 
 data Program = Program Expression
 

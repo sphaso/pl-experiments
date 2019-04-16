@@ -3,8 +3,8 @@ module UnitLet where
 import Test.Hspec
 import Data.Stack
 
-import Types
-import Interpreter
+import Let.Types
+import Let.Interpreter
 
 evaluate_test :: Spec
 evaluate_test = do

@@ -1,19 +1,23 @@
-module Interpreter where
+module Proc.Interpreter where
 
 import Data.Stack
 
-import Types
+import Proc.Types
 
 type Environment = Stack (String, Expression)
 
 emptyEnv :: Environment
 emptyEnv = stackNew
 
+pushEnv :: Environment -> Identifier -> Expression -> Environment
+pushEnv env (Identifier i) exp = stackPush env (i, exp)
+
 run :: Program -> Expression
 run (Program e) = evaluate emptyEnv e
 
 evaluate :: Environment -> Expression -> Expression
-evaluate _   (Number n) = Number n
+evaluate _   n@(Number _) = n
+evaluate _   p@(Proc _ _ _) = p
 evaluate _   (Minus (Number a) (Number b)) = Number (a - b)
 evaluate env (Minus e1 e2) = evaluate env (Minus a b)
     where
@@ -34,11 +38,19 @@ evaluate env (IsZero e) = if (evaluate env e) == Number 0 then Number 1 else Num
 evaluate env (IfThenElse (Number 1) t _) = evaluate env t
 evaluate env (IfThenElse (Number 0) _ f) = evaluate env f
 evaluate env (IfThenElse e t f) = evaluate env (IfThenElse (evaluate env e) t f)
-evaluate env (LetIn (Identifier i) v b) = evaluate (stackPush env (i, v)) b
-evaluate env (Identifier s) =
+-- WRONG
+-- I need to put itself in the local environment
+evaluate env (LetIn i (Proc v f e) b) = evaluate (pushEnv env i (Proc v f env)) b
+evaluate env (LetIn i v b) = evaluate (pushEnv env i v) b
+evaluate env (Call (Var s) e) = evaluate env (Call (evaluate env (Var s)) e)
+-- WRONG
+-- it won't be able to call itself from the local environment
+evaluate env (Call (Proc i e procE) x) = evaluate env res
+    where
+        res = evaluate (pushEnv procE i x) e
+evaluate env (Var s) =
     case stackPop env of
       Just (newEnv, (i, v)) ->
-          if i == s then
-              evaluate newEnv v
-          else evaluate newEnv (Identifier s)
-      Nothing -> Identifier s
+          if i == s then v
+          else evaluate newEnv (Var s)
+      Nothing -> error ("cannot find " ++ s)

@@ -38,16 +38,15 @@ evaluate env (IsZero e) = if (evaluate env e) == Number 0 then Number 1 else Num
 evaluate env (IfThenElse (Number 1) t _) = evaluate env t
 evaluate env (IfThenElse (Number 0) _ f) = evaluate env f
 evaluate env (IfThenElse e t f) = evaluate env (IfThenElse (evaluate env e) t f)
--- WRONG
--- I need to put itself in the local environment
+-- idea per ricorsione:
+-- where
+--     e1 = pushEnv env i (Proc v f e1)
 evaluate env (LetIn i (Proc v f e) b) = evaluate (pushEnv env i (Proc v f env)) b
 evaluate env (LetIn i v b) = evaluate (pushEnv env i v) b
 evaluate env (Call (Var s) e) = evaluate env (Call (evaluate env (Var s)) e)
--- WRONG
--- it won't be able to call itself from the local environment
-evaluate env (Call (Proc i e procE) x) = evaluate env res
+evaluate env (Call (Proc i e procE) x) = evaluate (pushEnv procE i arg) e
     where
-        res = evaluate (pushEnv procE i x) e
+        arg = evaluate env x
 evaluate env (Var s) =
     case stackPop env of
       Just (newEnv, (i, v)) ->

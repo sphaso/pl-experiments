@@ -47,6 +47,7 @@ evaluate env (Call (Var s) e) = evaluate env (Call (evaluate env (Var s)) e)
 evaluate env (Call (Proc i e procE) x) = evaluate (pushEnv procE i arg) e
     where
         arg = evaluate env x
+evaluate env (Call f arg) = evaluate env (Call (evaluate env f) arg)
 evaluate env (Var s) =
     case stackPop env of
       Just (newEnv, (i, v)) ->

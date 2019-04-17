@@ -12,7 +12,6 @@ instance (Eq a) => Eq (Stack a) where
                  (Just (s1, e1), Just (s2, e2)) -> e1 == e2 && s1 == s2
                  otherwise -> False
 
-
 data Expression = Number Int
                 | Minus Expression Expression
                 | Negate Expression

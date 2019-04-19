@@ -27,6 +27,18 @@ evaluate_test = do
                 expr = Call (Var "f") (Number 77)
                 res  = evaluate env expr
             res `shouldBe` Number 66
+        it "Simple Currying" $ do
+            let
+                env = emptyEnv
+                expr = (Call
+                            (Call
+                                (Proc (Identifier "x")
+                                    (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv)
+                                emptyEnv) (Number 5)
+                            ) (Number 3)
+                       )
+                res = evaluate env expr
+            res `shouldBe` Number 2
     describe "example expressions" $ do
         it "75a" $ do
             let
@@ -63,3 +75,20 @@ evaluate_test = do
                         (Call (Call (Var "f") (Number 5)) (Number 3))
                 res = evaluate env expr
             res `shouldBe` Number 2
+        it "3.25, factorial" $ do
+            let
+                env = emptyEnv
+                expr = LetIn
+                        (Identifier "f")
+                        (Proc (Identifier "x")
+                            (Proc (Identifier "y")
+                                (IfThenElse (IsZero (Var "x"))
+                                    (Var "y")
+                                    (Call (Call (Var "f") (Minus (Var "x") (Number 1))) (Mult (Var "x") (Var "y"))
+                                    )
+                                )
+                            emptyEnv)
+                        emptyEnv)
+                        (Call (Call (Var "f") (Number 5)) (Number 1))
+                res = evaluate env expr
+            res `shouldBe` Number 120

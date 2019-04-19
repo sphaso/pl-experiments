@@ -17,7 +17,7 @@ run (Program e) = evaluate emptyEnv e
 
 evaluate :: Environment -> Expression -> Expression
 evaluate _   n@(Number _) = n
-evaluate _   p@(Proc _ _ _) = p
+evaluate env (Proc i x _) = Proc i x env
 evaluate _   (Minus (Number a) (Number b)) = Number (a - b)
 evaluate env (Minus e1 e2) = evaluate env (Minus a b)
     where
@@ -38,10 +38,11 @@ evaluate env (IsZero e) = if (evaluate env e) == Number 0 then Number 1 else Num
 evaluate env (IfThenElse (Number 1) t _) = evaluate env t
 evaluate env (IfThenElse (Number 0) _ f) = evaluate env f
 evaluate env (IfThenElse e t f) = evaluate env (IfThenElse (evaluate env e) t f)
--- idea per ricorsione:
--- where
---     e1 = pushEnv env i (Proc v f e1)
-evaluate env (LetIn i (Proc v f e) b) = evaluate (pushEnv env i (Proc v f env)) b
+evaluate env (LetIn i (Proc v f e) b) = evaluate (pushEnv env i (Proc v f e1)) b
+   where
+-- this genius idea was put forward by my colleague Francesco who's
+-- obviously a bloody recursive wizard. Thank you
+       e1 = pushEnv env i (Proc v f e1)
 evaluate env (LetIn i v b) = evaluate (pushEnv env i v) b
 evaluate env (Call (Var s) e) = evaluate env (Call (evaluate env (Var s)) e)
 evaluate env (Call (Proc i e procE) x) = evaluate (pushEnv procE i arg) e

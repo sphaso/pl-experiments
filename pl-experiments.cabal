@@ -19,6 +19,9 @@ extra-source-files:  CHANGELOG.md, README.md
 
 library plex
   exposed-modules:
+    DeBruijn.Interpreter
+    DeBruijn.Translator
+    DeBruijn.Types
     Let.Parser
     Let.Interpreter
     Let.Types

@@ -18,45 +18,61 @@ evaluate_test = do
             res `shouldBe` Const 66
         it "Call stored function" $ do
             let
-                expr = (LetIn (Identifier "f") (Proc (Identifier "x") (Minus (Number 77) (Number 11)) emptyEnv) (Call (Var "f") (Number 0)))
-                tr = translate expr
-                res  = evaluate tr
-            print tr
+                expr = translate (LetIn (Identifier "f") (Proc (Identifier "x") (Minus (Number 77) (Number 11)) emptyEnv) (Call (Var "f") (Number 0)))
+                res  = evaluate expr
             res `shouldBe` Const 66
---      it "Call stored function with substitution" $ do
+        it "Call stored function with substitution" $ do
+            let
+                expr = translate $ LetIn (Identifier "f") (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv) (Call (Var "f") (Number 77))
+                res  = evaluate expr
+            res `shouldBe` Const 66
+        it "Simple Currying" $ do
+            let
+                expr = translate (Call
+                                    (Call
+                                        (Proc (Identifier "x")
+                                            (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv)
+                                        emptyEnv) (Number 5)
+                                    ) (Number 3)
+                               )
+                res = evaluate expr
+            res `shouldBe` Const (negate 2)
+    describe "example expressions" $ do
+         it "page 66b" $ do
+           let
+               expr = translate $ LetIn (Identifier "z") (Number 5)
+                                     (LetIn (Identifier "x") (Number 3)
+                                         (LetIn (Identifier "y") (Minus (Var "x") (Number 1))
+                                             (LetIn (Identifier "x") (Number 4) (Minus (Var "z")
+                                                (Minus (Var "x") (Var "y"))))
+                                         )
+                                     )
+               res = evaluate expr
+           res `shouldBe` Const 3
+         it "page 67" $ do
+           let
+               expr = translate $ LetIn (Identifier "x") (Number 7)
+                                    (LetIn (Identifier "y") (Number 2)
+                                        (LetIn (Identifier "y")
+                                            (LetIn (Identifier "x") (Minus (Var "x") (Number 1))
+                                                (Minus (Var "x") (Var "y")))
+                                            (Minus (Minus (Var "x") (Number 8)) (Var "y"))
+                                        )
+                                    )
+               res = evaluate expr
+           res `shouldBe` Const (negate 5)
+         it "75a" $ do
+            let
+                expr = translate $ LetIn (Identifier "f") (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv) (Call (Var "f") (Call (Var "f") (Number 77)))
+                res  = evaluate expr
+            res `shouldBe` Const 55
+--       it "75b" $ do
 --          let
---              env  = pushEnv emptyEnv (Identifier "f") (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv)
---              expr = Call (Var "f") (Number 77)
---              res  = evaluate env expr
---          res `shouldBe` Number 66
---      it "Simple Currying" $ do
+--              expr = translate $ Call (Proc (Identifier "f") (Call (Var "f") (Call (Var "f") (Number 77)) )emptyEnv) (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv)
+--              res  = evaluate expr
+--          res `shouldBe` Const 55
+--       it "76" $ do
 --          let
---              env = emptyEnv
---              expr = (Call
---                          (Call
---                              (Proc (Identifier "x")
---                                  (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv)
---                              emptyEnv) (Number 5)
---                          ) (Number 3)
---                     )
---              res = evaluate env expr
---          res `shouldBe` Number 2
---  describe "example expressions" $ do
---      it "75a" $ do
---          let
---              env  = emptyEnv
---              expr = LetIn (Identifier "f") (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv) (Call (Var "f") (Call (Var "f") (Number 77)))
---              res  = evaluate env expr
---          res `shouldBe` Number 55
---      it "75b" $ do
---          let
---              env  = emptyEnv
---              expr = Call (Proc (Identifier "f") (Call (Var "f") (Call (Var "f") (Number 77)) )emptyEnv) (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv)
---              res  = evaluate env expr
---          res `shouldBe` Number 55
---      it "76" $ do
---          let
---              env = emptyEnv
 --              expr = LetIn (Identifier "x") (Number 200) (
 --                       LetIn (Identifier "f") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv) (
 --                          LetIn (Identifier "x") (Number 100) (
@@ -65,18 +81,17 @@ evaluate_test = do
 --                              )
 --                          )
 --                      )
---              res = evaluate env expr
---          res `shouldBe` Number (negate 100)
+--              res = evaluate $ translate expr
+--          res `shouldBe` Const (negate 100)
 --  describe "exercises" $ do
 --      it "3.20, currying" $ do
 --          let
---              env = emptyEnv
 --              expr = LetIn
 --                      (Identifier "f")
 --                      (Proc (Identifier "x") (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv) emptyEnv)
 --                      (Call (Call (Var "f") (Number 5)) (Number 3))
---              res = evaluate env expr
---          res `shouldBe` Number 2
+--              res = evaluate expr
+--          res `shouldBe` Const 2
 --      it "3.25, factorial" $ do
 --          let
 --              env = emptyEnv

@@ -10,4 +10,5 @@ data NamelessExpression = Const Int
                         | NVar Int
                         | NLetIn NamelessExpression NamelessExpression
                         | NProc NamelessExpression
+                        | NCall NamelessExpression NamelessExpression
                 deriving (Eq, Show)

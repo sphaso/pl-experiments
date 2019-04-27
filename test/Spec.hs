@@ -8,6 +8,7 @@ import qualified UnitDeBruijn
 main :: IO ()
 main = hspec (
                  UnitLet.evaluate_test
+               >> UnitLet.parser_test
                >> UnitProc.evaluate_test
                >> UnitDeBruijn.translate_test
                >> UnitDeBruijn.evaluate_test

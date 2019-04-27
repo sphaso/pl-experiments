@@ -2,6 +2,8 @@ module Let.Types where
 
 data Program = Program Expression
 
+newtype Identifier = Identifier String deriving (Eq, Show)
+
 data Expression = Number Int
                 | Minus Expression Expression
                 | Negate Expression
@@ -9,6 +11,6 @@ data Expression = Number Int
                 | Div Expression Expression
                 | IsZero Expression
                 | IfThenElse Expression Expression Expression
-                | Identifier String
-                | LetIn Expression Expression Expression
+                | Var String
+                | LetIn Identifier Expression Expression
                 deriving (Eq, Show)

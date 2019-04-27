@@ -31,14 +31,12 @@ evaluate env (Div e1 e2) = evaluate env (Div a b)
         a = evaluate env e1
         b = evaluate env e2
 evaluate env (IsZero e) = if (evaluate env e) == Number 0 then Number 1 else Number 0
-evaluate env (IfThenElse (Number 1) t _) = evaluate env t
-evaluate env (IfThenElse (Number 0) _ f) = evaluate env f
-evaluate env (IfThenElse e t f) = evaluate env (IfThenElse (evaluate env e) t f)
+evaluate env (IfThenElse e t f) = if (evaluate env e) == Number 1 then evaluate env t else evaluate env f
 evaluate env (LetIn (Identifier i) v b) = evaluate (stackPush env (i, v)) b
-evaluate env (Identifier s) =
+evaluate env (Var s) =
     case stackPop env of
       Just (newEnv, (i, v)) ->
           if i == s then
               evaluate newEnv v
-          else evaluate newEnv (Identifier s)
-      Nothing -> Identifier s
+          else evaluate newEnv (Var s)
+      Nothing -> Var s

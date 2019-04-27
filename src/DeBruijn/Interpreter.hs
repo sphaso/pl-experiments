@@ -20,6 +20,8 @@ evaluate' :: Environment -> NamelessExpression -> NamelessExpression
 evaluate' _   c@(Const _) = c
 evaluate' _   (NMinus (Const a) (Const b)) = Const (a - b)
 evaluate' env (NMinus i j) = evaluate' env (NMinus (evaluate' env i) (evaluate' env j))
+evaluate' env (NIsZero b) = if (evaluate' env b) == Const 1 then Const 1 else Const 0
+evaluate' env (NIfThenElse c t f) = if (evaluate' env c) == Const 1 then (evaluate' env t) else (evaluate' env f)
 evaluate' env (NLetIn p@(NProc _) e) = evaluate' (extendEnv env p) e
 evaluate' env (NLetIn e b) = evaluate' newE b
     where

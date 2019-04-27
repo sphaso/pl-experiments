@@ -14,6 +14,8 @@ translate e = translate' [] e
 translate' :: [String] -> Expression -> NamelessExpression
 translate' _ (Number n) = Const n
 translate' env (Minus a b) = NMinus (translate' env a) (translate' env b)
+translate' env (IsZero a) = NIsZero (translate' env a)
+translate' env (IfThenElse c t f) = NIfThenElse (translate' env c) (translate' env t) (translate' env f)
 translate' env (LetIn (Identifier i) e b) = NLetIn (translate' fakeE e) (translate' newE b)
     where
         fakeE = extendEnv env ""

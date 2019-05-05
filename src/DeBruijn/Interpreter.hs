@@ -1,28 +1,15 @@
 module DeBruijn.Interpreter where
 
-import qualified Data.Map.Strict as M
 import Data.Stack
 
 import DeBruijn.Types
 
--- type Environment = M.Map Int NamelessExpression
-
 type Environment = Stack NamelessExpression
 
-pushEnv :: Environment -> NamelessExpression -> Environment
-pushEnv env exp = stackPush env exp
-
-extendEnv = pushEnv
-
--- extendEnv :: Environment -> NamelessExpression -> Environment
--- extendEnv env expr = M.insert i expr env
---    where
---      i = case M.lookupMax env of
---            Nothing     -> 0
---            Just (k, _) -> k + 1
+extendEnv :: Environment -> NamelessExpression -> Environment
+extendEnv env expr = stackPush env expr
 
 evaluate :: NamelessExpression -> NamelessExpression
--- evaluate = evaluate' M.empty
 evaluate = evaluate' stackNew
 
 evaluate' :: Environment -> NamelessExpression -> NamelessExpression
@@ -35,30 +22,25 @@ evaluate' _   (NPlus (Const a) (Const b)) = Const (a + b)
 evaluate' env (NPlus i j) = evaluate' env (NPlus (evaluate' env i) (evaluate' env j))
 evaluate' env (NIsZero b) = if (evaluate' env b) == Const 1 then Const 1 else Const 0
 evaluate' env (NIfThenElse c t f) = if (evaluate' env c) == Const 1 then (evaluate' env t) else (evaluate' env f)
-evaluate' env (NLetIn (NProc b) e) = evaluate' (extendEnv env c) e
-    where
+evaluate' env (NLetIn (NProc b) e) =
+    let
         c = NClosure b env
+    in
+        evaluate' (extendEnv env c) e
 evaluate' env (NLetIn e b) = evaluate' newE b
     where
         newE = extendEnv env (evaluate' env e)
-evaluate' _   (NProc b) = NProc b
+evaluate' env (NProc b) = NClosure b env
 evaluate' _   (NClosure b e) = NClosure b e
 evaluate' env (NCall v@(NVar _) e) = evaluate' env (NCall (evaluate' env v) e)
-evaluate' env (NCall (NProc b) a) = evaluate' env (NCall b arg)
-    where
-        arg = evaluate' env a
+evaluate' env (NCall (NProc b) a) = evaluate' env (NCall (NClosure b env) a)
 evaluate' env (NCall (NClosure b e) a) = evaluate' e (NCall b arg)
     where
         arg = evaluate' env a
-evaluate' env (NCall b e) = evaluate' (extendEnv env arg) b
-    where
-        arg = evaluate' env e
+evaluate' env (NCall b e) = evaluate' (extendEnv env e) b
 evaluate' env (NVar 0) = case stackPop env of
                            Nothing -> error "out of bounds"
                            Just (_, e)  -> e
 evaluate' env (NVar n) = case stackPop env of
                            Nothing -> error "oops"
                            Just (e, _) -> evaluate' e (NVar (n-1))
---evaluate' env (NVar i) = case env M.!? i of
---                          Nothing -> error ("index " ++ (show i) ++ " out of bounds")
---                          Just expr -> evaluate' env expr

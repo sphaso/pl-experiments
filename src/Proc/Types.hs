@@ -14,6 +14,7 @@ instance (Eq a) => Eq (Stack a) where
 
 data Expression = Number Int
                 | Minus Expression Expression
+                | Plus Expression Expression
                 | Negate Expression
                 | Mult Expression Expression
                 | Div Expression Expression

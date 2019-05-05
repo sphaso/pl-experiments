@@ -27,8 +27,6 @@ evaluate_test = do
                 res  = evaluate expr
             res `shouldBe` Const 66
         it "Simple Currying" $ do
-            -- for some reason Currying in my DeBruijn implementation takes
-            -- the arguments in reverse order
             let
                 expr = translate (Call
                                     (Call
@@ -68,11 +66,11 @@ evaluate_test = do
                 expr = translate $ LetIn (Identifier "f") (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv) (Call (Var "f") (Call (Var "f") (Number 77)))
                 res  = evaluate expr
             res `shouldBe` Const 55
---       it "75b" $ do
---          let
---              expr = translate $ Call (Proc (Identifier "f") (Call (Var "f") (Call (Var "f") (Number 77)) )emptyEnv) (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv)
---              res  = evaluate expr
---          res `shouldBe` Const 55
+         it "75b" $ do
+            let
+                expr = translate $ Call (Proc (Identifier "f") (Call (Var "f") (Call (Var "f") (Number 77)) )emptyEnv) (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv)
+                res  = evaluate expr
+            res `shouldBe` Const 55
          it "76" $ do
             let
                 expr = LetIn (Identifier "x") (Number 200) (
@@ -84,16 +82,30 @@ evaluate_test = do
                             )
                         )
                 res = evaluate $ translate expr
-            res `shouldBe` Const (negate 1)
-    describe "exercises" $ do
-        it "3.20, currying" $ do
+            res `shouldBe` Const (negate 100)
+         it "89" $ do
             let
-                expr = translate $ LetIn
-                        (Identifier "f")
-                        (Proc (Identifier "x") (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv) emptyEnv)
-                        (Call (Call (Var "f") (Number 5)) (Number 3))
+                expr = translate $ LetIn (Identifier "x") (Number 3) (
+                          LetIn (Identifier "y") (Number 4) (
+                             (Plus
+                                 (LetIn (Identifier "x")
+                                     (Plus (Var "y") (Number 5))
+                                     (Mult (Var "x") (Var "y")))
+                                  (Var "x")
+                             )
+                           )
+                        )
                 res = evaluate expr
-            res `shouldBe` Const (negate 2)
+            res `shouldBe` Const 39
+--  describe "exercises" $ do
+--      it "3.20, currying" $ do
+--          let
+--              expr = translate $ LetIn
+--                      (Identifier "f")
+--                      (Proc (Identifier "x") (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv) emptyEnv)
+--                      (Call (Call (Var "f") (Number 5)) (Number 3))
+--              res = evaluate expr
+--          res `shouldBe` Const (negate 2)
 --      it "3.25, factorial" $ do
 --          let
 --              expr = translate $ LetIn
@@ -114,16 +126,28 @@ evaluate_test = do
 translate_test :: Spec
 translate_test = do
     describe "example expressions" $ do
+        it "92" $ do
+            let
+               expr = LetIn (Identifier "x") (Number 42)
+                         (
+                             LetIn (Identifier "y") (Number 93)
+                                (Minus (Var "x") (Var "y"))
+                         )
+               res = NLetIn (Const 42)
+                             (NLetIn (Const 93)
+                                     (NMinus (NVar 1) (NVar 0))
+                             )
+            translate expr `shouldBe` res
         it "93" $ do
             let
                 expr = LetIn (Identifier "x") (Number 37)
                          (Proc (Identifier "y")
                              (
                                 LetIn (Identifier "z") (Minus (Var "y") (Var "x"))
-                                      (Minus (Var "z") (Var "y"))
+                                      (Minus (Var "x") (Var "y"))
                              )
                              emptyEnv
                          )
                 res = NLetIn (Const 37)
-                             (NProc (NLetIn (NMinus (NVar 1) (NVar 0)) (NMinus (NVar 2) (NVar 1))))
+                             (NProc (NLetIn (NMinus (NVar 0) (NVar 1)) (NMinus (NVar 2) (NVar 1))))
             translate expr `shouldBe` res

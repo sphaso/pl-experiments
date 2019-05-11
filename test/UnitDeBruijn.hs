@@ -71,18 +71,18 @@ evaluate_test = do
                 expr = translate $ Call (Proc (Identifier "f") (Call (Var "f") (Call (Var "f") (Number 77)) )emptyEnv) (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv)
                 res  = evaluate expr
             res `shouldBe` Const 55
-         it "76" $ do
-            let
-                expr = LetIn (Identifier "x") (Number 200) (
-                         LetIn (Identifier "f") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv) (
-                            LetIn (Identifier "x") (Number 100) (
-                                LetIn (Identifier "g") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv)
-                                    (Minus (Call (Var "f") (Number 1)) (Call (Var "g") (Number 1)))
-                                )
-                            )
-                        )
-                res = evaluate $ translate expr
-            res `shouldBe` Const (negate 100)
+--       it "76" $ do
+--          let
+--              expr = LetIn (Identifier "x") (Number 200) (
+--                       LetIn (Identifier "f") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv) (
+--                          LetIn (Identifier "x") (Number 100) (
+--                              LetIn (Identifier "g") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv)
+--                                  (Minus (Call (Var "f") (Number 1)) (Call (Var "g") (Number 1)))
+--                              )
+--                          )
+--                      )
+--              res = evaluate $ translate expr
+--          res `shouldBe` Const (negate 100)
          it "89" $ do
             let
                 expr = translate $ LetIn (Identifier "x") (Number 3) (
@@ -97,15 +97,15 @@ evaluate_test = do
                         )
                 res = evaluate expr
             res `shouldBe` Const 39
---  describe "exercises" $ do
---      it "3.20, currying" $ do
---          let
---              expr = translate $ LetIn
---                      (Identifier "f")
---                      (Proc (Identifier "x") (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv) emptyEnv)
---                      (Call (Call (Var "f") (Number 5)) (Number 3))
---              res = evaluate expr
---          res `shouldBe` Const (negate 2)
+    describe "exercises" $ do
+        it "3.20, currying" $ do
+            let
+                expr = translate $ LetIn
+                        (Identifier "f")
+                        (Proc (Identifier "x") (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv) emptyEnv)
+                        (Call (Call (Var "f") (Number 5)) (Number 3))
+                res = evaluate expr
+            res `shouldBe` Const (negate 2)
 --      it "3.25, factorial" $ do
 --          let
 --              expr = translate $ LetIn

@@ -7,7 +7,7 @@ import DeBruijn.Types
 type Environment = Stack NamelessExpression
 
 extendEnv :: Environment -> NamelessExpression -> Environment
-extendEnv env expr = stackPush env expr
+extendEnv = stackPush
 
 evaluate :: NamelessExpression -> NamelessExpression
 evaluate = evaluate' stackNew
@@ -20,21 +20,18 @@ evaluate' _   (NMult (Const a) (Const b)) = Const (a * b)
 evaluate' env (NMult i j) = evaluate' env (NMult (evaluate' env i) (evaluate' env j))
 evaluate' _   (NPlus (Const a) (Const b)) = Const (a + b)
 evaluate' env (NPlus i j) = evaluate' env (NPlus (evaluate' env i) (evaluate' env j))
-evaluate' env (NIsZero b) = if (evaluate' env b) == Const 1 then Const 1 else Const 0
-evaluate' env (NIfThenElse c t f) = if (evaluate' env c) == Const 1 then (evaluate' env t) else (evaluate' env f)
-evaluate' env (NLetIn (NProc b) e) =
-    let
-        c = NClosure b env
-    in
-        evaluate' (extendEnv env c) e
+evaluate' env (NIsZero b) = if evaluate' env b == Const 1 then Const 1 else Const 0
+evaluate' env (NIfThenElse c t f) = if evaluate' env c == Const 1 then evaluate' env t else evaluate' env f
 evaluate' env (NLetIn e b) = evaluate' newE b
     where
         newE = extendEnv env (evaluate' env e)
 evaluate' env (NProc b) = NClosure b env
 evaluate' _   (NClosure b e) = NClosure b e
-evaluate' env (NCall v@(NVar _) e) = evaluate' env (NCall (evaluate' env v) e)
+evaluate' env (NCall v@(NVar _) e) = evaluate' env (NCall (evaluate' newE v) e)
+    where
+        newE = extendEnv env e
 evaluate' env (NCall (NProc b) a) = evaluate' env (NCall (NClosure b env) a)
-evaluate' env (NCall (NClosure b e) a) = evaluate' e (NCall b arg)
+evaluate' env (NCall (NClosure b e) a) = evaluate' env (NCall b arg)
     where
         arg = evaluate' env a
 evaluate' env (NCall b e) = evaluate' (extendEnv env e) b

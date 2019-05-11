@@ -4,12 +4,13 @@ import Data.List (elemIndices)
 
 import Proc.Types
 import DeBruijn.Types
+import Proc.Interpreter (emptyEnv)
 
 extendEnv :: [String] -> String -> [String]
 extendEnv l v = v:l
 
 translate :: Expression -> NamelessExpression
-translate e = translate' [] e
+translate = translate' []
 
 translate' :: [String] -> Expression -> NamelessExpression
 translate' _ (Number n) = Const n
@@ -24,7 +25,7 @@ translate' env (LetIn (Identifier i) e b) = NLetIn (translate' env e) (translate
 translate' env (Proc (Identifier i) b _) = NProc (translate' newE b)
     where
         newE = extendEnv env i
-translate' env (Call p expr) = NCall (translate' env p) (translate' env expr)
+translate' env (Call b a) = NCall (translate' (extendEnv env "") b) (translate' env a)
 translate' env (Var x) = case elemIndices x env of
                            []  -> error ("cannot find " ++ x)
                            els -> NVar (minimum els)

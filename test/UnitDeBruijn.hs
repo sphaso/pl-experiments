@@ -8,8 +8,8 @@ import DeBruijn.Interpreter
 import DeBruijn.Types
 import DeBruijn.Translator
 
-evaluate_test :: Spec
-evaluate_test = do
+evaluateTest :: Spec
+evaluateTest = do
     describe "simple" $ do
         it "Call function" $ do
             let
@@ -71,33 +71,32 @@ evaluate_test = do
                 expr = translate $ Call (Proc (Identifier "f") (Call (Var "f") (Call (Var "f") (Number 77)) )emptyEnv) (Proc (Identifier "x") (Minus (Var "x") (Number 11)) emptyEnv)
                 res  = evaluate expr
             res `shouldBe` Const 55
---       it "76" $ do
---          let
---              expr = LetIn (Identifier "x") (Number 200) (
---                       LetIn (Identifier "f") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv) (
---                          LetIn (Identifier "x") (Number 100) (
---                              LetIn (Identifier "g") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv)
---                                  (Minus (Call (Var "f") (Number 1)) (Call (Var "g") (Number 1)))
---                              )
---                          )
---                      )
---              res = evaluate $ translate expr
---          res `shouldBe` Const (negate 100)
+         it "76" $ do
+            let
+                expr = LetIn (Identifier "x") (Number 200) (
+                         LetIn (Identifier "f") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv) (
+                            LetIn (Identifier "x") (Number 100) (
+                                LetIn (Identifier "g") (Proc (Identifier "z") (Minus (Var "z") (Var "x")) emptyEnv)
+                                    (Minus (Call (Var "f") (Number 1)) (Call (Var "g") (Number 1)))
+                                )
+                            )
+                        )
+                res = evaluate $ translate expr
+            res `shouldBe` Const (negate 100)
          it "89" $ do
             let
                 expr = translate $ LetIn (Identifier "x") (Number 3) (
-                          LetIn (Identifier "y") (Number 4) (
+                          LetIn (Identifier "y") (Number 4)
                              (Plus
                                  (LetIn (Identifier "x")
                                      (Plus (Var "y") (Number 5))
                                      (Mult (Var "x") (Var "y")))
                                   (Var "x")
                              )
-                           )
                         )
                 res = evaluate expr
             res `shouldBe` Const 39
-    describe "exercises" $ do
+    describe "exercises" $
         it "3.20, currying" $ do
             let
                 expr = translate $ LetIn
@@ -123,8 +122,8 @@ evaluate_test = do
 --              res = evaluate expr
 --          res `shouldBe` Const 120
 
-translate_test :: Spec
-translate_test = do
+translateTest :: Spec
+translateTest =
     describe "example expressions" $ do
         it "92" $ do
             let

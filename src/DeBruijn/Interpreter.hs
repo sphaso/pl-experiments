@@ -31,7 +31,7 @@ evaluate' env (NCall v@(NVar _) e) = evaluate' env (NCall (evaluate' newE v) e)
     where
         newE = extendEnv env e
 evaluate' env (NCall (NProc b) a) = evaluate' env (NCall (NClosure b env) a)
-evaluate' env (NCall (NClosure b e) a) = evaluate' env (NCall b arg)
+evaluate' env (NCall (NClosure b e) a) = evaluate' e (NCall b arg)
     where
         arg = evaluate' env a
 evaluate' env (NCall b e) = evaluate' (extendEnv env e) b

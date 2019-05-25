@@ -30,11 +30,15 @@ evaluate' _   (NClosure b e) = NClosure b e
 evaluate' env (NCall v@(NVar _) e) = evaluate' env (NCall (evaluate' newE v) e)
     where
         newE = extendEnv env e
-evaluate' env (NCall (NProc b) a) = evaluate' env (NCall (NClosure b env) a)
-evaluate' env (NCall (NClosure b e) a) = evaluate' e (NCall b arg)
+evaluate' env (NCall (NProc b) a) = evaluate' (extendEnv env arg) b
     where
         arg = evaluate' env a
-evaluate' env (NCall b e) = evaluate' (extendEnv env e) b
+evaluate' env (NCall (NClosure b e) a) = evaluate' (extendEnv e arg) b
+    where
+        arg = evaluate' env a
+evaluate' env (NCall b e) = evaluate' newE (NCall (evaluate' newE b) e)
+    where
+        newE = extendEnv env e
 evaluate' env (NVar 0) = case stackPop env of
                            Nothing -> error "out of bounds"
                            Just (_, e)  -> e

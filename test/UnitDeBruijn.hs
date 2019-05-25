@@ -36,7 +36,7 @@ evaluateTest = do
                                     ) (Number 3)
                                )
                 res = evaluate expr
-            res `shouldBe` Const (negate 2)
+            res `shouldBe` Const 2
     describe "example expressions" $ do
          it "page 66b" $ do
            let
@@ -96,7 +96,7 @@ evaluateTest = do
                         )
                 res = evaluate expr
             res `shouldBe` Const 39
-    describe "exercises" $
+    describe "exercises" $ do
         it "3.20, currying" $ do
             let
                 expr = translate $ LetIn
@@ -104,23 +104,23 @@ evaluateTest = do
                         (Proc (Identifier "x") (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv) emptyEnv)
                         (Call (Call (Var "f") (Number 5)) (Number 3))
                 res = evaluate expr
-            res `shouldBe` Const (negate 2)
---      it "3.25, factorial" $ do
---          let
---              expr = translate $ LetIn
---                      (Identifier "f")
---                      (Proc (Identifier "x")
---                          (Proc (Identifier "y")
---                              (IfThenElse (IsZero (Var "x"))
---                                  (Var "y")
---                                  (Call (Call (Var "f") (Minus (Var "x") (Number 1))) (Mult (Var "x") (Var "y"))
---                                  )
---                              )
---                          emptyEnv)
---                      emptyEnv)
---                      (Call (Call (Var "f") (Number 1)) (Number 5))
---              res = evaluate expr
---          res `shouldBe` Const 120
+            res `shouldBe` Const 2
+        it "3.25, factorial" $ do
+            let
+                expr = translate $ LetIn
+                        (Identifier "f")
+                        (Proc (Identifier "x")
+                            (Proc (Identifier "y")
+                                (IfThenElse (IsZero (Var "x"))
+                                    (Var "y")
+                                    (Call (Call (Var "f") (Minus (Var "x") (Number 1))) (Mult (Var "x") (Var "y"))
+                                    )
+                                )
+                            emptyEnv)
+                        emptyEnv)
+                        (Call (Call (Var "f") (Number 1)) (Number 5))
+                res = evaluate expr
+            res `shouldBe` Const 120
 
 translateTest :: Spec
 translateTest =
@@ -150,3 +150,11 @@ translateTest =
                 res = NLetIn (Const 37)
                              (NProc (NLetIn (NMinus (NVar 0) (NVar 1)) (NMinus (NVar 2) (NVar 1))))
             translate expr `shouldBe` res
+        it "3.20, currying" $ do
+            let
+                expr = translate $ LetIn
+                        (Identifier "f")
+                        (Proc (Identifier "x") (Proc (Identifier "y") (Minus (Var "x") (Var "y")) emptyEnv) emptyEnv)
+                        (Call (Call (Var "f") (Number 5)) (Number 3))
+            expr `shouldBe` NLetIn (NProc (NProc (NMinus (NVar 1) (NVar 0)))) (NCall (NCall (NVar 2) (Const 5)) (Const 3))
+

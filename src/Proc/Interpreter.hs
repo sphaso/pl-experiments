@@ -34,7 +34,7 @@ evaluate env (Div e1 e2) = evaluate env (Div a b)
     where
         a = evaluate env e1
         b = evaluate env e2
-evaluate env (IsZero e) = if (evaluate env e) == Number 0 then Number 1 else Number 0
+evaluate env (IsZero e) = if evaluate env e == Number 0 then Number 1 else Number 0
 evaluate env (IfThenElse (Number 1) t _) = evaluate env t
 evaluate env (IfThenElse (Number 0) _ f) = evaluate env f
 evaluate env (IfThenElse e t f) = evaluate env (IfThenElse (evaluate env e) t f)

@@ -1,6 +1,6 @@
 module Let.Types where
 
-data Program = Program Expression
+newtype Program = Program Expression
 
 newtype Identifier = Identifier String deriving (Eq, Show)
 

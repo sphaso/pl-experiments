@@ -6,8 +6,7 @@ instance (Eq a) => Eq (Stack a) where
     (==) x y = case (stackPop x, stackPop y) of
                  (Nothing, Nothing) -> True
                  (Just (s1, e1), Just (s2, e2)) -> e1 == e2 && s1 == s2
-                 otherwise -> False
-
+                 _ -> False
 
 data NamelessExpression = Const Int
                         | NMinus NamelessExpression NamelessExpression

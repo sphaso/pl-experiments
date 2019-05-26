@@ -96,7 +96,7 @@ evaluateTest = do
                         )
                 res = evaluate expr
             res `shouldBe` Const 39
-    describe "exercises" $ do
+    describe "exercises" $
         it "3.20, currying" $ do
             let
                 expr = translate $ LetIn
@@ -105,22 +105,6 @@ evaluateTest = do
                         (Call (Call (Var "f") (Number 5)) (Number 3))
                 res = evaluate expr
             res `shouldBe` Const 2
-        it "3.25, factorial" $ do
-            let
-                expr = translate $ LetIn
-                        (Identifier "f")
-                        (Proc (Identifier "x")
-                            (Proc (Identifier "y")
-                                (IfThenElse (IsZero (Var "x"))
-                                    (Var "y")
-                                    (Call (Call (Var "f") (Minus (Var "x") (Number 1))) (Mult (Var "x") (Var "y"))
-                                    )
-                                )
-                            emptyEnv)
-                        emptyEnv)
-                        (Call (Call (Var "f") (Number 1)) (Number 5))
-                res = evaluate expr
-            res `shouldBe` Const 120
 
 translateTest :: Spec
 translateTest =

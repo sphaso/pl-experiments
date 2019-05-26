@@ -30,8 +30,8 @@ evaluate env (Div e1 e2) = evaluate env (Div a b)
     where
         a = evaluate env e1
         b = evaluate env e2
-evaluate env (IsZero e) = if (evaluate env e) == Number 0 then Number 1 else Number 0
-evaluate env (IfThenElse e t f) = if (evaluate env e) == Number 1 then evaluate env t else evaluate env f
+evaluate env (IsZero e) = if evaluate env e == Number 0 then Number 1 else Number 0
+evaluate env (IfThenElse e t f) = if evaluate env e == Number 1 then evaluate env t else evaluate env f
 evaluate env (LetIn (Identifier i) v b) = evaluate (stackPush env (i, v)) b
 evaluate env (Var s) =
     case stackPop env of

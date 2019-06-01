@@ -5,19 +5,21 @@ import Data.Stack
 import ExplicitRefs.Types
 
 type Environment = Stack (String, Expression)
-type Store = Stack (String, Expression)
+type Store = [Expression]
 
 emptyEnv :: Environment
 emptyEnv = stackNew
 
 emptyStore :: Store
-emptyStore = stackNew
+emptyStore = []
 
 pushEnv :: Environment -> Identifier -> Expression -> Environment
 pushEnv env (Identifier i) exp = stackPush env (i, exp)
 
-pushStore :: Store -> Identifier -> Expression -> Store
-pushStore store (Identifier i) expr = stackPush store (i, expr)
+pushStore :: Store -> Expression -> (Expression, Store)
+pushStore store expr = (Ref $ length newStore - 1, newStore)
+    where
+        newStore = store ++ [expr]
 
 run :: Program -> Expression
 run (Program e) = v
@@ -40,12 +42,15 @@ evaluate env (IfThenElse (Number 0) _ f) s = evaluate env f s
 evaluate env (IfThenElse e t f) s = evaluate env (IfThenElse z t f) s'
     where
         (s', z) = evaluate env e s
-evaluate env (LetIn i (LetIn j (NewRef expr) b) b') s = evaluate env (LetIn i b b') s'
+evaluate env (LetIn i (LetIn j (NewRef expr) b) b') s = evaluate (pushEnv newE i ref) (LetIn i b b') s''
     where
-        (s', _) = evaluate env (SetRef j expr) s
-evaluate env (LetIn i (NewRef expr) b) s = evaluate env b s'
+        (s', val) = evaluate env expr s
+        (ref, s'') = pushStore s' val
+        newE = pushEnv env j ref
+evaluate env (LetIn i (NewRef expr) b) s = evaluate (pushEnv env i ref) b s''
     where
-        (s', _) = evaluate env (SetRef i expr) s
+        (s', val) = evaluate env expr s
+        (ref, s'') = pushStore s' val
 evaluate env (LetIn i (Proc v f) b) s = evaluate (pushEnv env i (Closure v f e1)) b s
    where
        e1 = pushEnv env i (Closure v f e1)
@@ -65,20 +70,13 @@ evaluate env (IO [e]) s = evaluate env e s
 evaluate env (IO (x:xs)) s = evaluate env (IO xs) s'
     where
         (s', _) = evaluate env x s
-evaluate env (SetRef j@(Identifier s) expr) store =
-    case stackPop s' of
-        Just (newStore, (i, v)) ->
-            if i == s then (stackPush newStore (i, value), value)
-            else evaluate env (SetRef j value) newStore
-        Nothing -> (stackPush s' (s, value), value)
-  where
-    (s', value) = evaluate env expr store
-evaluate env (DeRef j@(Identifier s)) store =
-    case stackPop store of
-      Just (newStore, (i, v)) ->
-          if i == s then (store, v)
-          else evaluate env (DeRef j) newStore
-      Nothing -> error ("cannot find " ++ s)
+evaluate env (SetRef j@(Identifier s) expr) store = (take i s' ++ [value] ++ drop (i + 1) s', value)
+    where
+        (_, Ref i) = evaluate env (Var s) store
+        (s', value) = evaluate env expr store
+evaluate env (DeRef j@(Identifier s)) store = (store, store !! i)
+    where
+        (_, Ref i) = evaluate env (Var s) store
 evaluate env (Var s) store =
     case stackPop env of
       Just (newEnv, (i, v)) ->

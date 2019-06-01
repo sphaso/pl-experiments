@@ -24,5 +24,6 @@ data Expression = Number Int
                 | SetRef Identifier Expression
                 | DeRef Identifier
                 | NewRef Expression
+                | Ref Int
                 | IO [Expression]
                 deriving (Eq, Show)

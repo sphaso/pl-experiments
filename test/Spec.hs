@@ -4,6 +4,7 @@ import Test.QuickCheck
 import qualified UnitLet
 import qualified UnitProc
 import qualified UnitDeBruijn
+import qualified UnitExplicitRefs
 
 main :: IO ()
 main = hspec (
@@ -12,4 +13,5 @@ main = hspec (
                >> UnitProc.evaluate_test
                >> UnitDeBruijn.translateTest
                >> UnitDeBruijn.evaluateTest
+              >> UnitExplicitRefs.evaluateTest
              )

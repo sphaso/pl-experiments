@@ -27,6 +27,8 @@ library plex
     Let.Types
     Proc.Interpreter
     Proc.Types
+    ExplicitRefs.Types
+    ExplicitRefs.Interpreter
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13

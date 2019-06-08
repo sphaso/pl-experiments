@@ -5,6 +5,7 @@ import qualified UnitLet
 import qualified UnitProc
 import qualified UnitDeBruijn
 import qualified UnitExplicitRefs
+import qualified UnitCPS
 
 main :: IO ()
 main = hspec (
@@ -14,4 +15,5 @@ main = hspec (
                >> UnitDeBruijn.translateTest
                >> UnitDeBruijn.evaluateTest
               >> UnitExplicitRefs.evaluateTest
+              >> UnitCPS.evaluateTest
              )

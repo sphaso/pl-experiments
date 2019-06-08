@@ -4,5 +4,8 @@ Experiments from the book "Essentials of Programming Languages" by Friedman and 
 LET - parser missing    
 PROC - parser missing    
 LETREC - skipped, since PROC already includes recursion    
-(DeBruijn) - Added indices to PROC, finally hacked a currying-working implementation but something else is broken. :(
-
+PROC (DeBruijn) - Added indices to PROC, finally hacked a currying-working implementation but recursion is broken and not really sure how to implement it without using a Y combinator    
+ExplicitRefs - parser missing    
+ImplicitRefs - skipped, didn't seem a major step forward from ExplicitRefs    
+Continuation Passing Style (CPS) - still have to fix currying and recursion   
+Trampolines - skipped, didn't see the point of implementing it in Haskell    

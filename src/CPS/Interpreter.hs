@@ -35,7 +35,7 @@ applyCont IdCont x = x
 
 evaluate :: Environment -> Expression -> Continuation -> Expression
 evaluate _   n@(Number _) c = applyCont c n
-evaluate env (Proc i x) c = applyCont c (Proc i x)
+evaluate env (Proc i x) c = applyCont c (Closure i x env)
 evaluate env c@Closure{} cont = applyCont cont c
 evaluate env (Minus e1 e2) c = evaluate env e1 (Diff1Cont e2 env c)
 evaluate env (Mult e1 e2) c = evaluate env e1 (Mult1Cont e2 env c)

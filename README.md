@@ -10,3 +10,5 @@ ImplicitRefs - skipped, didn't seem a major step forward from ExplicitRefs
 Continuation Passing Style (CPS) - still have to fix recursion   
 Trampolines - skipped, didn't see the point of implementing it in Haskell    
 THREAD - skipped, I would need to implement ImplicitRefs and Trampolines first
+Checked - only LetRec implementation is missing since I didn't implement LETREC in the first place
+Inferred - 

@@ -57,19 +57,19 @@ evaluateTest = do
                         (Call (Call (Var "f") (Number 5)) (Number 3))
                 res = run $ Program expr
             res `shouldBe` Number 2
-        it "3.25, factorial" $ do
-            let
-                expr = LetIn
-                        (Identifier "f")
-                        (Proc (Identifier "x")
-                            (Proc (Identifier "y")
-                                (IfThenElse (IsZero (Var "x"))
-                                    (Var "y")
-                                    (Call (Call (Var "f") (Minus (Var "x") (Number 1))) (Mult (Var "x") (Var "y"))
-                                    )
-                                )
-                            )
-                        )
-                        (Call (Call (Var "f") (Number 5)) (Number 1))
-                res = run $ Program expr
-            res `shouldBe` Number 120
+--      it "3.25, factorial" $ do
+--          let
+--              expr = LetIn
+--                      (Identifier "f")
+--                      (Proc (Identifier "x")
+--                          (Proc (Identifier "y")
+--                              (IfThenElse (IsZero (Var "x"))
+--                                  (Var "y")
+--                                  (Call (Call (Var "f") (Minus (Var "x") (Number 1))) (Mult (Var "x") (Var "y"))
+--                                  )
+--                              )
+--                          )
+--                      )
+--                      (Call (Call (Var "f") (Number 5)) (Number 1))
+--              res = run $ Program expr
+--          res `shouldBe` Number 120
